@@ -1,0 +1,105 @@
+
+//snippet file
+<div class="nws-product-grid-item nws-pdp-grid-{{product.id}}-{{ uid }}-uid" >
+  <div class="nws-product-grid-item-images" >
+     {%- render 'kt-wishlist-product', product: product -%}
+     <a href="{{ product.url }}" >
+      {% if product.featured_image != blank %} 
+         <img src="{{ product.featured_image | img_url: '660x' }}" data-img-id="{{ product.featured_image.id }}" data-option="{{ product.featured_image.alt }}" alt="{{ product.featured_image.alt }}" />
+         {% if product.images != blank %} 
+           {% for image in product.images %}
+             {%- assign variant-img-id = false -%}
+               {% for variant in product.variants %}
+                  {% if variant.image.id == image.id %}
+                    {%- assign variant-img-id = true -%}
+                    {% break %}
+                 {% endif %}
+                {% endfor %}
+             {% if product.featured_image.id != image.id and variant-img-id == true %}
+               <img src="{{ image.src | product_img_url: '660x' }}" data-img-id="{{ image.id }}" data-option="{{ image.alt }}" alt="{{ image.alt }}" />
+             {% endif %}
+           {% endfor %}
+          {% endif %}
+      {% else %}
+         <img src="//cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png" />
+      {% endif %}
+     </a>
+  </div>
+
+  <div class="nws-product-grid-item-info" >
+    {% render 'nws-stars' %}
+    <span class="nws-product-grid-item-heading" >{{ product.title }}</span>
+  </div>
+
+  <form class="product-form product-form-product-template nws-product-grid-item-form" method="post" action="/cart/add" id="product-form-{{ product.variants.first.id }}" accept-charset="UTF-8" enctype="multipart/form-data" novalidate="novalidate" >
+      <input type="hidden" name="form_type" value="product">
+      <input type="hidden" name="utf8" value="✓">
+      
+      {%- assign current_variant = product.selected_or_first_available_variant -%}
+      <div class="product__price">
+        {% render 'nws-product-price', variant: current_variant %}
+      </div>
+
+    <div class="{% unless product.has_only_default_variant %}variants-{%endunless%}nws-quickview nws-product-grid-item-hover" >
+      
+      {%- unless product.has_only_default_variant -%}
+        <div class="nws-fake-selection {{ product.handle }}_options" >
+          {%- for option in product.options_with_values -%}
+              {%- assign option_name = option.name | replace: ' ', '-' | downcase -%}
+              {%- assign option_id = forloop.index0 -%}
+              <label class="nws-name-color" >
+                {%- for value in option.values -%}
+                  {% for variant in product.variants %}
+                      {% if variant.title == value %}
+                        {%- assign variant-id = variant.id -%}
+                       {% break %}
+                     {% endif %}
+                    {% endfor %}
+                  {% if product.selected_or_first_available_variant.id == variant-id %}{{ value }}{% endif %}
+                {%-endfor -%} 
+              </label>
+              <div class="nws-fake-selection-ul nws-option-{{ option_name }}" >
+                {%- for value in option.values -%}
+                    {% for variant in product.variants %}
+                      {% if variant.title == value %}
+                        {%- assign variant-img-id = variant.image.id -%}
+                        {%- assign variant-id = variant.id -%}
+                        {%- assign variant-img-alt = variant.image.alt | replace: " ", "-" | downcase -%}
+                        {%- assign variant-available = variant.available -%}
+                        {%- assign variant-color = variant.metafields.nws-color.nws-color-key -%}
+                        {%- assign variant-img = variant.metafields.nws-img.nws-img-key -%}
+                        {% break %}
+                     {% endif %}
+                    {% endfor %}
+                  {% if variant-available == true %}
+                    {% assign dfilter = value | replace: " ", "-" | downcase %}
+                    <div class="nws-fake-selection-li {% if product.selected_or_first_available_variant.id == variant-id %}nws-fs-active{% endif %}" 
+                      data-img-id="{{ variant-img-id }}" 
+                      data-select-value="{{ value }}" 
+                      data-slide-filter="{% if variant-img-alt == dfilter %}nws-qv-img-{{ dfilter }}{% endif %}"
+                      data-option="nws-variant-id-option-{{ option_id }}" 
+                      style="{% if variant-img != blank %}background-image:url('{{variant-img | replace:'.png','_30x.png' | replace:'.gif','_30x.gif' | replace:'.jpg','_30x.jpg' | replace:'.jpeg','_30x.jpeg' }}'); background-color:transparent; border:none;{% else %}background-color:{{variant-color}}; border-color:{{variant-color}};{% endif %}" >
+                      <input class="product-form__variants" type="radio" name="size" value="{{ variant-id }}" data-uid="nws-pdp-grid-{{product.id}}-{{ uid }}-uid" data-img-id="{{ variant-img-id }}" {% if product.selected_or_first_available_variant.id == variant-id %}checked="checked"{% endif %} data-select-value="{{ value }}" data-option="nws-variant-id-option-{{ option_id }}"  />
+                      <span>{{ value }}</span>
+                    </div>
+                  {% endif %}
+                {%-endfor -%}    
+              </div>
+          {% endfor -%}
+          </div>
+        {%- endunless -%}
+        {% if product.available %}<span class="nws-quick-veiw-btn" data-handle="{{product.handle}}" >Quickview</span>{% endif %}
+
+        <input type="hidden" class="nws-product-form__variants {{ product.handle }}_id" value="{{ product.selected_or_first_available_variant.id }}" name="id" />
+    
+        <div class="nws-pdp-submit-div" >
+          {% if product.available %}
+            <input type="submit" value="ADD TO CART" class="nws-pdp-submit nws-atc-btn"/>
+            {%- unless product.has_only_default_variant -%}<a class="nws-find-btn" href="#" >FIND MY SHADE</a>{% endunless %}
+          {% else %}
+            <input type="button" value="Sold Out" class="nws-pdp-submit nws-atc-btn" disabled="disabled" />
+          {% endif %}
+        </div>
+      </div>
+    </form> 
+</div>
