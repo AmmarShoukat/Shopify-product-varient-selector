@@ -20,8 +20,7 @@ $( document ).ready(function() {
           if ($(this).attr('data-val') == value){
             $(this).attr("selected", "selected");
           }
-        });
-        
+
         $(".nws-pdp-template .nws-shade-color").text(value);
         $('.nws-pdp-template .nws-fake-selection-li[data-option="'+optVal+'"]').removeClass('nws-fs-active');
         $(this).parent().addClass('nws-fs-active');
@@ -42,3 +41,5 @@ $( document ).ready(function() {
           $('.'+uid+'.nws-product-grid-item .nws-product-grid-item-images img').removeClass('nws-fs-active');
           $('.'+uid+'.nws-product-grid-item .nws-product-grid-item-images img[data-img-id="'+ImgID+'"]').addClass('nws-fs-active');
        });
+});
+        
