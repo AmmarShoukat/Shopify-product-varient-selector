@@ -1,0 +1,50 @@
+<!-- nws-home-products -->
+<div class="nws-home-products nws-ja-padding" {% if section.settings.section-color != blank %}style="background-color:{{ section.settings.section-color }};"{% endif %} >
+    <div class="container-fuild">
+        <div class="nws-home-products-m-heading main-site-heading">
+          {% if section.settings.m-heading != blank %}<h2>{{ section.settings.m-heading }}</h2>{% endif %}
+        </div>
+        {% assign count = 0 %}
+        {% for product in collections[section.settings.collection].products %}
+           {% assign count = count | plus: 1 %}
+        {% endfor %}
+        <div class="row nws-home-products-row {% if count > 4 %}nws-home-products-slider{% else %}nws-home-products-slider-none{% endif %}">
+          {% for product in collections[section.settings.collection].products %}
+             {% assign uid = forloop.index %}
+             <div class="nws-col-row">
+               {%- render "nws-product-grid-item", product: product, uid: uid -%}
+             </div>
+          {% endfor %}
+        </div>
+    </div>
+</div>
+<!-- end nws-home-products -->
+
+{% schema %}
+{
+  "name": "NWS - Home Products",
+  "settings": [
+      {
+        "type": "color",
+        "id": "section-color",
+        "label": "Section BG Color"
+      },
+      {
+        "type": "text",
+        "id": "m-heading",
+        "label": "Heading"
+      },
+      {
+        "type": "collection",
+        "id": "collection",
+        "label": "Collection"
+      }
+  ],
+   "presets": [
+    {
+      "name": "NWS - Home Products",
+      "category": "NWS - Sections"
+    }
+  ]
+}
+{% endschema %}
